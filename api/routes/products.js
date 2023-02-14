@@ -1,13 +1,12 @@
 const express = require('express')
 const router = express.Router()
-
-
 const Product =require('../models/products')
-
 const mongoose = require('mongoose')
 
 router.get('/', (req, res, next)=>{
-    Product.find().exec().then( (docs)=>{
+    Product.find().then( (docs)=>{
+        console.log('list')
+
         const response = {
             count: docs.length,
             products: docs.map( (docs)=>{
@@ -29,6 +28,14 @@ router.get('/', (req, res, next)=>{
                data: response
             }
         )
+
+        // res.status(200).json( 
+        //     {
+        //         status: true,
+        //         count: docs.length,
+        //         data: docs
+        //     }
+        // )
     }).catch( (err)=>{
         res.json( 
             {
@@ -88,13 +95,14 @@ router.get('/:productId', (req, res, next)=>{
 router.patch('/:productId', (req, res, next)=>{
     const id = req.params.productId 
     const updateOps = {}
+    console.log('11111updateOps',req.body);
 
-    for(const ops of req.body){
-        updateOps[ops.propName] = ops.value
-    }
+    // for(const ops of req.body){
+    //     updateOps[ops.propName] = ops.value
+    // }
+console.log('updateOps',updateOps)
 
-
-    Product.update( { _id: id}, {$set: updateOps} ).exec().then( (result)=>{
+    Product.findByIdAndUpdate( id, req.body,{new:true}).exec().then( (result)=>{
         console.log(result)
         res.json({
             status: true,
